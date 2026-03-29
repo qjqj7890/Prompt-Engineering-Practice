@@ -76,7 +76,7 @@ for i, a in enumerate(articles):
 - 잘 뽑혔는지 확인
 
 ## Claude 프롬프트 설계
-- 가장 대표적인 단순, 역할부여, Few-shot으로 나눔
+- 가장 대표적인 Zero-shot, 역할부여, Few-shot으로 나눔
 
 ```
 import anthropic
@@ -99,7 +99,7 @@ def call_api(prompt):
 - 반복수행 하기 위해 함수정의
 - 토큰을 조금 더 늘려봄(분석 잘 되라고)
 ```
-# 단순 분류
+# Zero-shot
 def analyze_v1(title, content):
     prompt = f"다음 증시 기사를 긍정/부정/중립 중 하나로 분류하고 한 줄 이유를 설명해줘.\n\n제목: {title}\n본문: {content}"
     return call_api(prompt)
@@ -165,3 +165,15 @@ def analyze_v3(title, content):
 - 특히 V3 Few-shot에서는 프롬프트에 명시하지 않았는데도 표 형식과 이모지를 활용해 근거를 분해함
 
 ![프롬프트 버전별 감성 분류 결과](classification.png)
+- V2에서 중립이 늘었음. 뉘앙스를 파악하여 표현
+- V3에서는 다시 부정, 긍정이 각각 1개씩 늘었는데, 이는 어닝서프라이즈 -> 긍정 등 Few-shot에 준 예시들이 영향을 미친것으로 파악됨
+- 실제 정확도를 판별하려면 기사를 읽어보고 판단해봐야 하지만 이는 생략
+
+### 이외에도
+1. Chain-of-Thought (CoT) Prompting
+- 단순히 few shot의 input - output 쌍이 아니라 중간 추론 과정(Reasoning steps)을 함께 예시로 제공
+
+2. Self-Consistency
+- 모델이 단일한 추론 경로를 따라가다 오류를 범하는 것을 방지하기 위해, 여러 개의 다양한 추론 경로(Reasoning paths)를 생성하고 그중 가장 많이 도출된 결론을 채택.
+
+3. RAG
